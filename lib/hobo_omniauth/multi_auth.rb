@@ -9,7 +9,13 @@ module HoboOmniauth
         unless authorization
           info = auth.info.to_hash
           extra = auth.extra._?.raw_info
-          info.reverse_merge!(extra.to_hash) unless extra.nil?
+          unless extra.nil?
+            if extra.respond_to?("to_hash")
+              info.reverse_merge!(extra.to_hash)
+            elsif extra.respond_to?("to_h")
+              info.reverse_merge!(extra.to_h)
+            end
+          end
           info['email_address'] = info['email']
           info['provider'] = auth.provider
           info['uid'] = auth.uid
